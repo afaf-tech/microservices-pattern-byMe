@@ -1,0 +1,281 @@
+grpc = resource : https://www.youtube.com/watch?v=OuyxRE9xLw4
+	- advantages = lebih aman kanrena type defifnition
+	- grpc auth guard in nestjs = resource: https://github.com/nestjs/nest/issues/3848 :: every service should have the same jwt secret token
+
+
+nestjs microservices full course = resource : https://www.youtube.com/watch?v=IsubcKdZPyE
+microservices saga pattern = resource: https://microservices.io/patterns/data/saga.html
+connectivity between each services = resource: https://relevant.software/blog/microservices-database-management/
+
+
+microservices from eko kurniawan khannedy = reference :https://docs.google.com/presentation/d/1lKnpXhljmYwKgdnb1K8GDrpCYuao_ZHHGn24gX_um2M/edit#slide=id.g65b6d848d9_0_47
+
+- Microservices Programmer Zaman Now
+1. Intro : 
+	- 
+2. Arsitektur Monolith: 
+	- Sebelum ke microservices biasanya sudah ada Arsitektur Monolith.
+	- Sigle Deployment Unit: Semua fitur dibuat dalam sebuah aplikasi besar.
+	- disarankan kalo membuat aplikasi dimulai dari app monolith dahulu. : jika tidak tau seberapa besar nantinya.
+	- Mudah didevelop, dideploy, ditest, discale.
+	--
+	- Masalah di Arsitektur Monolith: 
+		- Mengintimidasi Developer yang baru bergabung.
+		- Scaling development dengan banyak developer agak menyulitkan. 
+		- Butuh kontrak panjang dengan teknologi yang digunakan (bahasa pemrograman, database, dan lain-lain).
+		- Scaling pada bagian tertentu sulit dilakukan.
+		- Running App monolith sangat berat.
+		
+3. Arsitektur Microservices
+	- Aplikasi-aplikasi kecil yang saling bekerja sama.
+	- Fokus mengerjakan satu pekerjaan dengan baik.
+	- Independen, dapat dideploy dan diubah tanpa tergantung dengan aplikasi lain.
+	- Setiap komponen pada ssistem dibuat dalam service.
+	- Komunikasi antar service biasanya melaluli network-call. - jika di monolith tinggal memanggil method service.
+	---
+	- Masalah di Microservices:
+		- Distributed System.
+		- Komunikasi antar server rawan error. sehingga harus banyak error handling.
+		- Testing interaksi antar service cendedung lebih sulit.
+		
+4. Database Per Service
+	- Decentralized Database.
+	- tidak masalah jika satu service punya dua database. yang masalah itu sebaliknya.
+		untuk memastikan antar service itu tidak ketergantungan. 
+		
+5. Shared Database
+	- Boleh dilakukan jika pembuatan microservices pertama dilakukan karena migrasi dari monolith.
+	- Ketika bingung memecahkan data antar service.
+	- Ketika dikejar waktu, sehingga tidak ada waktu untuk membuat api.
+	
+6. NoSql ( not only sql ).
+	- Document Oriented Database. ex: mongodb
+	- Key-Value Database : redis.
+	- Column Families Database. ( per column bisa beda2 tiap record .) : apache cassandra
+	- Graph Database. ex: neo4j
+	- Search Database. ( untuk performa searching yang cepat ). ex: elasticsearch.
+	- Time Series Database. ( bisa query based on time ). ex: influxdb
+	- Dan Lain-Lain.
+	
+7. Remote Procedure Invocation.
+	- Komunikasi antar Service:
+		- Idealnya komunikasi dilakukan melalui RPI ( Remote Procedure Invocation) atau RPC (Remote Procedural Call)
+		- Tidak direkomendasikan komunikasi melalui via database.
+	- Contoh:
+		- Restful API (HTTP)
+		- gRPC
+		- Apache Thrift 
+		- Soap
+		- Java RMI
+		- Corba ( Common Object Request Broker Architecture )
+		- dll. :: rekomendasi gunakan yang paling populer.
+	- keuntungan :
+		- sederhana dan mudah.
+		- biasanya digunakan untuk komunikasi request - reply.
+		- digunakan untuk proses sync ( yang butuh menunggu jawaban ).
+	- masalah dikomunikasi rpi:
+		- proses lama ( pada email service dan sms service )
+		- mengirim data yang sama berkali-kali ( pada finance dan report service )
+		- membuat pararel proses sangat rumit.
+		
+8. Messaging
+	- Ketika butuh data dari service lain.
+		- Bisa dilakukan untuk komunikasi async.
+		- asyn artinya komunikasi tidak perlu peduli balasan dari service yang dituju.
+		- biasanya komunikasi messaging membutuhkan Message Channel sebagai jembatan untuk mengirim dan menerima data.
+		- Direkomendasikan menggunakan aplikasi message broker untuk melakukan management message channel.\
+		- Cocok digunakan untuk komunikasi yang tidak membutuhkan reply dari receiver.
+	- Contoh Message Broker : 
+		- Redis(PUBSUB)
+		- Apache Kafka
+		- Rabbit MQ
+		- NSQ
+		- Google PubSub
+		- Amazon Web Service SQS
+		- dan lain lain
+		
+9. Type of Microservices
+	- ada 3 jenis kategori
+		- Stateless Microservices.
+			:: Biasanya tidak memiliki database.
+			:: Digunakan untuk melakukan tugas yang sederhana.
+			:: Biasanya juga sebagai utility untuk microservice lain.
+			:: tidak bergantung dengan microservice lain.
+			:: contoh: email service dan sms service.
+		- Persistence Microservices.
+			:: memiliki database.
+			:: sebagai Master Data Microservice.
+			:: digunakan untuk mengolah data di databass (CRUD)
+		- Aggregation Microservices.
+			:: Tergantung dengan microservice lain.
+			:: Biasa digunakan sebagai pusat business logic aplikasi.
+			:: Boleh memiliki database atau tidak.
+			:: Tidak bisa berdiri sendiri.
+			:: Contoh : Cart Service dan Payment Service.
+			
+10. Service Orchestration.
+	- Sebelumnya kita sudah bahas dengan tipe aggregation.
+	- Cara aggregation microservices berkomunikasi dengan microservice lain, jika menggunakan remote 
+		procedure invocation, maka dinamakan Service Orchestration Pattern.
+	- Cocok digunakan untuk yang baru belajar microservices.
+	- keuntungan: 
+		:: mudah dibuat, karena kode business logic akan terpusat di aggregation microservices.
+		:: mudah dimengerti, karena kode business logic akan terpusat di aggregation microservice
+	- kekurangan : 
+		:: aggregation microservice terlalu ketergantungan dengan microservice lain.
+		:: aggregation microservice akan lebih lambat karena harus terkoneksi dengan microservice lain.
+		:: aggregation akan lebih mudah error jika microservice lain terdapat masalah.
+		:: jika perlu microservice baru, maka perlu dilakukan perubahan di aggregation microservice.
+11. Service Choreography
+	- berbeda dengan dengan service orchestration.
+	- Komunikasi aggregation service dengan microservice lain menggunakan messaging atau async.
+	- dalam service orchestration, aggregation microservice adalah service yang sangat kompleks dan mengerti semua alur
+		business logic. sedangkan berbeda dengan service choreography, semua microservice dituntut untuk menjadi pintar,
+		tidak hanya oleh aggregation microservice.
+	- kekurangan: 
+		:: terlalu ketergantungan dengan message broker. karena menggunakan asyn operation.
+		:: lebih sulit didebug ketika terjadi masalah.
+		:: Business logic akan terdistribusi di semua microservices. sehingga sulit dimengerti secara keseluruhan.
+	- kelebihan:
+		:: aggregation service akan lebih cepat karena tidak tergantung dengan microservice lain.
+		:: jika ada microservice baru, aggregation microservice tidak perlu melakukan perubahan lagi.
+
+12. API Gateway
+	- Masalah Mengekspos Microservices
+		:: Semua service bisa diakses dari luar.
+		:: Jika butuh Authentication. harus implemented on all microservices.
+		:: Rawan terjadi kebocoran data.
+	- Api Gateway
+		:: adalah aplikasi yang bertugas sebagai gerbang dari luar ke dalam.
+		:: Luar adalah akses dari internet, dan Dalam adalah aplikasi microservices.
+		:: API Gateway bertugas sebagai proxy server ke semua aplikasi microservices.
+		:: Aplikasi microservices hanya bisa diakses dari luar melalui API Gateway.
+	- Keuntungan:
+		::  Lebih aman karena satu gerbang.
+		:: 	Service tidak perlu implement prosess Authentication, cukup dilakukan di api gateway.
+		::  Api gateway juga bisa digunakan sebagai load balancer.
+		::  Bisa digunakan sebagai rate limiter.
+		:: Bisa digunakan sebagai pengaman sehingga error dari service tidak terekspos.
+		
+	- Contoh :
+		:: Nginx
+		:: Apache HTTPD
+		:: KONG
+		:: Netflix Zul
+		:: Spring Cloud Gateway
+		
+13. Authentication and Authorization
+	- Authentication:
+		:: Credential validation to verify indentity owner.
+	- Authorization: 
+		:: process after authentication
+		:: validate is indentity owner has access to certain resource.
+		:: ex: Access-Control List
+	## Microservice Authentication Process.:':
+		:: Create Auth service can only be accessed through Api Gateway.
+		:: Supported Technologies:
+			::: secure cookie
+			::: oauth
+			::: Json Web Token
+			::: Basic Auth
+			::: Api Key / Secret Key
+
+14. BakcEnd for Frontend 	
+	::: permasalahan banyak jenis frontend
+		- Tiap frontend punya mekanisme autentikasi berbeda
+		- Kecepatan bandwidth tiap frontend berbeda
+		- API yang dibutuykan tiap frontend berbeda
+		- Semua kebutuhan jenis frontend harus diimplementasikan di satu API Gateway
+			:: what is bandwidth : https://www.paessler.com/it-explained/bandwidth
+	::: Back end for frontend
+		- penyedia backend khusus untuk frontend tertentu
+		- biasanya satu backend melayani satu frontend secara specific
+		- Makin banyak jenis frontend, makin banyak jenis backend yang dibuat
+		-
+	::: Keuntungan BackEnd for Frontend
+		- Pengembangan bavkend untuk tiap frontend bisa terisolasi satu sama lain
+		- Logic untuk frontend tidak tercampur di satu backend
+	::: GraphQL : alternative backend for frontend
+		- GraphQL adalah query language untuk api
+		- GraphQL dapat digunakan untuk memanipulasi data apa saja yang ingin didapatkan
+		- Frontend bebas menentukan data apa aja yang ingin didapatkan
+		- BackEnd hanya perlu menyediakan data lengkap, dan frontend bisa dengan bebas menentukan data apa saja yang diinginkan
+	::: Kekurangan GraphQL
+		- Butuh melakukan development GraphQL Server di BackEnd
+		- Butuh melakukan development GraphQL Client di Frontend
+	
+15. CQRS ( Command Query Responsibility Segregation )
+	:: CQRS adalah proses membedakan operasi Command dan operasi Query
+	:: Operasi Command adalah operasi merubah data (Create, Update, Delete)
+	:: Operasi Query adalah operasi mengambil data ( Get, Search)
+	:: Dalam CQRS, biasanya service atau database ::dibedakan:: untuk kebutuhan COMMMAND dan kebutuhan QUERY.
+	:: Keuntungan:
+		# Bisa memilih database berbeda yang optimal untuk proses Command dan Query, sehingga operasi Command dan Search 
+			bisa lebih cepat, karena database nya sudah disesuaikan dengan kebutuhan.
+		# MembedakanModel untuk Command dan Query di aplikasi akan lebih mudah dibanding digabung di satu model yang sama untuk
+			proses Command dan Query.
+		# Performa aplikasi akan lebuh baik, karena ktia membeadakan component untuk Command dan Query.
+	:: kenapa?, .. karena jika kita menggunakan index di table maka operasi search/query akan cepat. tapi operasi create or update akan lambat
+					. dan ketika tidak menggunakan index maka sebaliknya. jadi untuk itu kita menggunakan segregation.
+	:: Keuntungan CQRS menggunakan Messaging
+		* Aplikasi Command dan Query terpisah, sehingga bisa dikerjakan oleh tim yang berbeda secara pararel
+		* Aplikasi Command tidak perlu pusing memikirkan struktur data aplikasi query, hanya cukup mengirim datanya ke message broker.
+		* Scaling aplikasi bisa sesuai dengan kebutuhan, baik itu Command atau Query.
+		* Jika Aplikasi Query sedang stop atau error, data dari aplikasi Command akan tetap aman tersimpan di Message broker.
+		* Mekanisme retry akan lebih mudah dilakukan jika melalui message broker.
+
+16. Server Side Discovery
+	:: adalah : membuat server khusus sebagai router atau load balancer ke service
+	:: Client hanya butuh terkoneksi ke router atau load balancer
+	:: Jika jumlah node service bertambah atau berkurang, router hanya perlu dirubah, client tidk perlu berubah.
+	:: Contoh Load Balancer atau Router 
+		- Nginx
+		- Apache HTTPD
+		- Traefik
+	:: kekurangan: 		
+		- tiap service harus memiliki router atau load balancer
+		- agar tidak terjadi single point of failure maka router atau load balancer harus disetup sebanyak 2 instance
+		- cost biaya akan lebih mahal, karena 1 service harus menjalankan 2 router.
+
+17. Client Side Discovery
+	:: adalah solusi agar client harus bisa tahu lokasi semua service yang akan dituju
+	:: tidak perlu lagi ada router atau load balancer untuk berkomunikasi dengan service lain.
+	:: semua logic untuk mendistribusikan traffic harus dilakukan di client atau service yang akan melakukan request.
+	:: http multi endpoint : neflix reborn
+	:: trade off : jika cost tidak menjadi problem maka lebih baik menggunakan server side discovery.
+	:: kekurangan 
+		:= client harus tahu lokasi semua service
+		:= Jika jumlah node service bertambah atau berkurang, client harus diubah untuk lokasi barunya.
+		:= Jika client salah mengimplementasikan logic untuk load balancer, maka traffic ke service yang dituju bisa 
+			tidak merata pembagiannya.
+		:= perhatikan tentang beberapa bahasa pemrograman yang minta merestart ketike terjadi perubhan di config.
+
+18. Service Registry
+	// digunakan untuk optimasi client side discovery
+	:: adalah aplikasi yang digunakan sebagai tempat untuk menyimpan semua informasi yang berhubungan dengan 
+		lokasi service.
+	:: Semua service akan meregistrasikan alamat lokasi nya di Service Registry ketika pertama kali nyala
+	:: Semua service akan laporan ke service registry jika akan berhenti beroperasi, sehingga service registry akan menghilangkan 
+		informasi service tersebut agar tidak mendapat traffic dari servic yang bertanya.
+	:: Contoh 
+		:= Hashicorp Consul
+		:= Netflix Eureka
+
+19. Centralized Configuration
+	:: Dimana menyimpan configurasi
+		- Konfigurasi adalah sesuatu yang tidak asing saay membuat aplikasi
+		- tiap aplikasi biasanya memiliki konfigurasi, seperti konfigurasi database
+		- pertanyaannya, dimana sebaiknya menyimpan konfigurasi? agar mudah untuk dimaintain dan digunakan oleh aplikasi kita?
+	:: contoh lokasi konfigurasi
+		- database : mudah untuk dirubah
+		- file : dirubah melalui server
+		- environment variable : tidak akan bisa dirubah kecuali mematikan server
+	:: Centralized Configuration
+		:= pattern dimana kita menyimpan semua konfigurasi di sebuah aplikasi atau service
+		:= service yang butuh konfigurasi akan bertanya ke aplkas tersebut untuk mendapatkan data konfigurasinya.
+		:= Contoh Aplikasi Centralized Configuration
+			- Hashicorp Consul
+			- Hashicorp Vault
+			- Etcd
+			- Zookeper
+			- Doozerd
